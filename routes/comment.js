@@ -16,15 +16,22 @@ router.post("/campgrounds/:id/comments" , isLoggedIn ,function(req , res){
             res.redirect("/campgrounds");
         }
         else {
-            Comment.create(req.body.comment,function(err , comment) {
-                comment.author.id = req.user._id;
-                comment.author.username = req.user.username;
-                comment.save();
-                campground.comments.push(comment);
-                campground.save();
-                req.flash("success" , "comment added successully.");
-                res.redirect("/campgrounds/"+campground._id);
-            });
+            console.log(req.body.comment.text);
+            if(req.body.comment.text.length > 0){
+              Comment.create(req.body.comment,function(err , comment) {
+                  comment.author.id = req.user._id;
+                  comment.author.username = req.user.username;
+                  comment.save();
+                  campground.comments.push(comment);
+                  campground.save();
+                  req.flash("success" , "comment added successully.");
+                  res.redirect("/campgrounds/"+campground._id);
+              });
+            }
+            else {
+              req.flash("error" , "please write something");
+              res.redirect("back");
+            }
         }
     })
 });

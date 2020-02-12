@@ -21,15 +21,34 @@ router.post("/campgrounds" , isLoggedIn , function(req , res){
       id: req.user._id,
       username: req.user.username
     }
-    var campground = {name : name,price:price ,image : image , description:desc , author:author};
+    console.log(req.body);
+    // console.log(req.body.name.length);
+    if(name.length>0 && price.length>0 && image.length>0 && desc.length>0){
+      validateFileType();
+      function validateFileType(){
+          var fileName = image;
+          var idxDot = fileName.lastIndexOf(".") + 1;
+          var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
+          if (extFile=="jpg" || extFile=="jpeg" || extFile=="png"){
+      var campground = {name : name,price:price ,image : image , description:desc , author:author};
     // campgrounds.push(campground);
     Campground.create(campground , function(err , newly){
         if(err)
             console.log(err);
         else
-            console.log(newly);
+            // console.log(newly);
             res.redirect("/campgrounds");
-    })
+    });
+  }else{
+      req.flash("error","invalid file type. only png, jpg, jpeg are allowed.")
+      res.redirect("back");
+  }
+}
+  }
+  else {
+    req.flash("error" , "please fill all fields.")
+    res.redirect("back");
+  }
 
 })
 
@@ -109,5 +128,7 @@ function check(req , res , next) {
     res.redirect("back");
   }
 }
+
+
 
 module.exports = router;
